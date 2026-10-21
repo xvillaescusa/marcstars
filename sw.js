@@ -10,7 +10,7 @@
 //  ¡IMPORTANTE! Si cambias el juego y lo vuelves a subir, sube también el
 //  número de VERSION: así se borra la caché vieja.
 // =============================================================
-const VERSION = "marcstars-v4";
+const VERSION = "marcstars-v5";
 const ARCHIVOS = [
   "./",
   "img/agua.svg",
@@ -20,6 +20,7 @@ const ARCHIVOS = [
   "img/iconos/apple-touch-icon.png",
   "img/iconos/icono-192.png",
   "img/iconos/icono-512.png",
+  "img/marc-presentacion.png",
   "img/marc-retrato.png",
   "img/marc.svg",
   "img/muro.svg",
