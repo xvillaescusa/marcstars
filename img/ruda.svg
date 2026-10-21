@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Sprite visto desde ARRIBA y mirando a la DERECHA (ángulo 0).
+       El juego lo gira hacia donde apunta el personaje. -->
+  <!-- arma -->
+  <rect x="38" y="25" width="22" height="6" rx="2" fill="#5b5b5b" stroke="#1e1e1e" stroke-width="2"/>
+  <rect x="38" y="33" width="22" height="6" rx="2" fill="#5b5b5b" stroke="#1e1e1e" stroke-width="2"/>
+  <!-- cuerpo -->
+  <circle cx="30" cy="32" r="20" fill="#e67e22" stroke="#1e1e1e" stroke-width="3"/>
+  <!-- pelo / parte de atrás de la cabeza -->
+  <path d="M30 13.5 A18.5 18.5 0 0 0 30 50.5 A12 18.5 0 0 1 30 13.5 Z" fill="#a04000"/>
+  <path d="M14 22 A20 20 0 0 1 30 12 L30 52 A20 20 0 0 1 14 42 Z" fill="#7f8c8d" stroke="#1e1e1e" stroke-width="2" opacity="0.9"/>
+  <!-- ojos (miran hacia delante) -->
+  <circle cx="35" cy="23" r="4.5" fill="white" stroke="#1e1e1e" stroke-width="1.5"/>
+  <circle cx="36.5" cy="23" r="2.2" fill="#1e1e1e"/>
+  <circle cx="35" cy="41" r="4.5" fill="white" stroke="#1e1e1e" stroke-width="1.5"/>
+  <circle cx="36.5" cy="41" r="2.2" fill="#1e1e1e"/>
+  
+  <!-- manos sujetando el arma -->
+  <circle cx="49" cy="28" r="4.5" fill="#f2c08f" stroke="#1e1e1e" stroke-width="2"/>
+  <circle cx="49" cy="37" r="4.5" fill="#f2c08f" stroke="#1e1e1e" stroke-width="2"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <!-- Baldosa de suelo de 2x2 casillas (se repite por todo el mapa) -->
+  <rect width="80" height="80" fill="#74b955"/>
+  <rect width="40" height="40" fill="#6aae4c"/>
+  <rect x="40" y="40" width="40" height="40" fill="#6aae4c"/>
+  <path d="M12 30 l2 -6 l2 6 M55 15 l2 -6 l2 6 M60 65 l2 -6 l2 6 M25 70 l2 -6 l2 6"
+        stroke="#4f8f36" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

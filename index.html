@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- ★ NUEVO: para el móvil. Ocupar toda la pantalla, sin zoom, y que en iPhone
+       se pueda "Añadir a pantalla de inicio" y abrir como una app -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MarcStars">
+  <!-- ★ NUEVO (paso 19): versión web. El "manifest" dice el nombre, el icono y que
+       se abra a pantalla completa y en horizontal al instalarlo en el móvil -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="img/iconos/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="img/iconos/icono-192.png">
+  <meta name="theme-color" content="#000000">
+  <title>MarcStars</title>
+  <style>
+    /* ★ CAMBIADO: el juego ocupa TODA la ventana (antes 960x640 fijo) */
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000;
+                 touch-action: none; -webkit-user-select: none; user-select: none;
+                 -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+    /* dos lienzos UNO ENCIMA DEL OTRO
+         - vista3d: lo dibuja Three.js (el mundo en 3D)
+         - juego:   un lienzo 2D TRANSPARENTE encima para el marcador, barras de vida, menús y joysticks */
+    #contenedor { position: fixed; left: 0; top: 0; width: 100%; height: 100%; }
+    #contenedor canvas { position: absolute; left: 0; top: 0; display: block; }
+  </style>
+</head>
+<body>
+  <div id="contenedor">
+    <canvas id="vista3d" width="960" height="640"></canvas>
+    <canvas id="juego" width="960" height="640"></canvas>
+  </div>
+
+  <!-- Three.js, una librería para hacer 3D en el navegador.
+       Está copiada en js/lib, así funciona sin internet. -->
+  <script src="js/lib/three.min.js"></script>
+  <!-- el "cargador" de modelos .glb de Three.js -->
+  <script src="js/lib/GLTFLoader.js"></script>
+  <script src="js/lib/SkeletonUtils.js"></script>   <!-- copiar modelos con esqueleto -->
+
+  <script src="js/config.js"></script>
+  <script src="js/imagenes.js"></script>
+  <script src="js/brawlers.js"></script>
+  <script src="js/mapa.js"></script>
+  <script src="js/efectos.js"></script>
+  <script src="js/balas.js"></script>
+  <script src="js/jugador.js"></script>
+  <script src="js/enemigos.js"></script>
+  <script src="js/super.js"></script>
+  <script src="js/entrada.js"></script>
+  <script src="js/tactil.js"></script>    <!-- ★ NUEVO: joysticks táctiles para el móvil -->
+  <script src="js/modelos/marc-sprites.js"></script> <!-- la hoja de sprites de MarcStars -->
+  <script src="js/modelos-glb.js"></script>        <!-- cargar, copiar y animar modelos .glb -->
+  <script src="js/sprites.js"></script>              <!-- personajes 2D que miran a la cámara -->
+  <script src="js/modelo-marc.js"></script>        <!-- el modelo hecho con formas (plan B) -->
+  <script src="js/escena3d.js"></script>  <!-- el mundo en 3D -->
+  <script src="js/hud.js"></script>       <!-- lo 2D de encima (antes dibujo.js) -->
+  <script src="js/principal.js"></script>
+</body>
+</html>
