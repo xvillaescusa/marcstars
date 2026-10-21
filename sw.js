@@ -10,7 +10,7 @@
 //  ¡IMPORTANTE! Si cambias el juego y lo vuelves a subir, sube también el
 //  número de VERSION: así se borra la caché vieja.
 // =============================================================
-const VERSION = "marcstars-v1";
+const VERSION = "marcstars-v2";
 const ARCHIVOS = [
   "./",
   "img/agua.svg",
