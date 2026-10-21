@@ -14,6 +14,7 @@ const RUTAS_IMAGENES = {
   ruda:    "img/ruda.svg",
   pluma:   "img/pluma.svg",
   marc:    "img/marc-retrato.png",   // foto del modelo .glb (de frente)
+  marcGrande: "img/marc-presentacion.png",   // ★ PASO 22: MarcStars en grande para la presentación
   enemigo: "img/enemigo.svg",
   muro:    "img/muro.svg",
   arbusto: "img/arbusto.svg",

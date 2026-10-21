@@ -206,6 +206,12 @@ function rectTarjeta(i) {
 
 // Devuelve el número de tarjeta que hay bajo el ratón, o -1 si ninguna
 function tarjetaBajoRaton() {
+  // ★ PASO 22: con un solo brawler, vale tocar el personaje o el botón JUGAR
+  if (BRAWLERS.length === 1) {
+    const L = layoutPresentacion(), x = raton.pantallaX, y = raton.pantallaY;
+    const dentro = (r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+    return (dentro(L.pers) || dentro(L.boton)) ? 0 : -1;
+  }
   // ★ pasar del píxel de la pantalla al "píxel de diseño" (960x640)
   const u = escalaUI();
   const px = (raton.pantallaX - u.ox) / u.e, py = (raton.pantallaY - u.oy) / u.e;
@@ -229,6 +235,7 @@ function dibujarEstadistica(texto, valor, maximo, x, y) {
 }
 
 function dibujarSeleccion() {
+  if (BRAWLERS.length === 1) { dibujarPresentacion(); return; }   // ★ PASO 22
   ctx.fillStyle = "#2d3436";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   // ★ NUEVO: todo lo de abajo se dibuja en "coordenadas de diseño" y se escala
@@ -317,4 +324,158 @@ function dibujarSeleccion() {
     ctx.fillText("Súper: " + b.super.nombre, sx, r.y + 318);
   }
   ctx.restore();
+}
+
+// =============================================================
+// ★ PASO 22: PANTALLA DE PRESENTACIÓN (cuando solo hay un brawler)
+// =============================================================
+// Como en Brawl Stars: el personaje MUY GRANDE a la izquierda y su ficha
+// (nombre, rol, estadísticas, súper y botón JUGAR) a la derecha.
+// Aquí NO usamos el diseño fijo de 960x640: medimos la pantalla real para
+// aprovecharla entera (y respetamos la muesca del iPhone con margenSeguro).
+
+// Dónde va cada cosa, en píxeles de pantalla. La usan el dibujo Y el toque.
+function layoutPresentacion() {
+  const izq = margenSeguro.izq, der = canvas.width - margenSeguro.der;
+  const arr = margenSeguro.arr, aba = canvas.height - margenSeguro.aba;
+  const ancho = der - izq, alto = aba - arr;
+  const k = Math.min(ancho / 960, alto / 540);          // "unidad" de tamaño
+
+  // Personaje: lo más grande posible dentro de la mitad izquierda
+  const img = IMAGENES.marcGrande;
+  const prop = img ? img.width / img.height : 0.7;      // ancho / alto del dibujo
+  const zonaAncho = ancho * 0.48;
+  let h = alto * 0.9;                                   // casi todo el alto...
+  if (h * prop > zonaAncho * 0.95) h = zonaAncho * 0.95 / prop;   // ...sin salirse de su mitad
+  const w = h * prop;
+  const pies = aba - alto * 0.04;
+  const pers = { x: izq + zonaAncho / 2 - w / 2, y: pies - h, w: w, h: h };
+
+  // Ficha a la derecha
+  const px = izq + ancho * 0.5, pw = der - px - 24 * k;
+  const bw = Math.min(pw, 320 * k), bh = 70 * k;
+  const boton = { x: px, y: aba - alto * 0.06 - bh, w: bw, h: bh };
+  return { izq, der, arr, aba, ancho, alto, k, pers, panel: { x: px, w: pw }, boton };
+}
+
+// Texto grueso con borde negro, alineado a la izquierda (para la ficha)
+function textoFicha(texto, x, y, tam, color, borde) {
+  ctx.font = "900 " + tam + "px sans-serif";
+  ctx.textAlign = "left";
+  ctx.lineJoin = "round";
+  if (borde) { ctx.lineWidth = borde; ctx.strokeStyle = "#111"; ctx.strokeText(texto, x, y); }
+  ctx.fillStyle = color;
+  ctx.fillText(texto, x, y);
+}
+
+// Una fila de estadística: nombre, barra y número
+function filaEstadistica(L, texto, valor, maximo, y) {
+  const k = L.k, x = L.panel.x, anchoBarra = Math.min(L.panel.w - 200 * k, 260 * k);
+  textoFicha(texto, x, y, 20 * k, "#e8ecff", 0);
+  const bx = x + 110 * k, by = y - 16 * k, bh = 16 * k;
+  ctx.fillStyle = "rgba(0,0,0,0.45)";
+  ctx.fillRect(bx, by, anchoBarra, bh);
+  ctx.fillStyle = "#ffd32a";
+  ctx.fillRect(bx, by, anchoBarra * Math.min(1, valor / maximo), bh);
+  ctx.strokeStyle = "#111"; ctx.lineWidth = 2 * k; ctx.strokeRect(bx, by, anchoBarra, bh);
+  textoFicha(String(valor), bx + anchoBarra + 12 * k, y, 20 * k, "white", 4 * k);
+}
+
+function dibujarPresentacion() {
+  const L = layoutPresentacion(), k = L.k, b = BRAWLERS[0];
+  const t = performance.now() / 1000;                   // segundos, para animar
+  const W = canvas.width, H = canvas.height;
+
+  // 1) Fondo: degradado azul -> morado, como el menú de Brawl Stars
+  const fondo = ctx.createLinearGradient(0, 0, 0, H);
+  fondo.addColorStop(0, "#2a6edc");
+  fondo.addColorStop(1, "#4a2a9a");
+  ctx.fillStyle = fondo;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2) Rayos de luz que giran despacio detrás del personaje
+  const cx = L.pers.x + L.pers.w / 2, cy = L.pers.y + L.pers.h * 0.45;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(t * 0.08);
+  ctx.fillStyle = "rgba(255,255,255,0.07)";
+  const largo = Math.hypot(W, H);
+  for (let i = 0; i < 16; i += 2) {
+    const a0 = i * Math.PI / 8, a1 = a0 + Math.PI / 8;
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(a0) * largo, Math.sin(a0) * largo);
+    ctx.lineTo(Math.cos(a1) * largo, Math.sin(a1) * largo);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // 3) Brillo amarillo detrás del personaje
+  const radio = L.pers.h * 0.55;
+  const brillo = ctx.createRadialGradient(cx, cy, 0, cx, cy, radio);
+  brillo.addColorStop(0, "rgba(255,220,90,0.85)");
+  brillo.addColorStop(0.6, "rgba(255,200,40,0.35)");
+  brillo.addColorStop(1, "rgba(255,200,40,0)");
+  ctx.fillStyle = brillo;
+  ctx.beginPath(); ctx.arc(cx, cy, radio, 0, Math.PI * 2); ctx.fill();
+
+  // 4) Sombra en el suelo y el personaje (respira: sube y baja un poquito)
+  const pies = L.pers.y + L.pers.h;
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.beginPath(); ctx.ellipse(cx, pies - 4 * k, L.pers.w * 0.42, 14 * k, 0, 0, Math.PI * 2); ctx.fill();
+  const img = IMAGENES.marcGrande || IMAGENES.marc;
+  if (img) {
+    const respira = Math.sin(t * 2.2) * 0.012;          // 1,2 % más alto / más bajo
+    const h = L.pers.h * (1 + respira), w = L.pers.w * (1 - respira * 0.5);
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.55)";               // borde oscuro suave alrededor
+    ctx.shadowBlur = 14 * k;
+    ctx.drawImage(img, cx - w / 2, pies - h, w, h);
+    ctx.restore();
+  }
+
+  // 5) La ficha de la derecha
+  const x = L.panel.x;
+  let y = L.arr + L.alto * 0.17;
+  textoFicha("BRAWLER", x, y, 18 * k, "#ffd32a", 4 * k);
+  y += 62 * k;
+  textoFicha(b.nombre.toUpperCase(), x, y, 60 * k, "white", 8 * k);
+  // etiqueta del rol
+  y += 16 * k;
+  ctx.font = "900 " + 18 * k + "px sans-serif";
+  const rw = ctx.measureText(b.rol.toUpperCase()).width + 24 * k;
+  ctx.fillStyle = b.color;
+  ctx.fillRect(x, y, rw, 30 * k);
+  ctx.strokeStyle = "#111"; ctx.lineWidth = 2 * k; ctx.strokeRect(x, y, rw, 30 * k);
+  textoFicha(b.rol.toUpperCase(), x + 12 * k, y + 22 * k, 18 * k, "white", 3 * k);
+  y += 62 * k;
+  textoFicha(b.descripcion.join(" "), x, y, 18 * k, "#e8ecff", 0);
+
+  // estadísticas (con un máximo de referencia, para que las barras signifiquen algo)
+  const a = b.ataque;
+  const dano = a.dano * a.balas * (a.rafaga || 1);
+  y += 44 * k; filaEstadistica(L, "Vida",      b.vida,      5000, y);
+  y += 32 * k; filaEstadistica(L, "Daño",      dano,        1500, y);
+  y += 32 * k; filaEstadistica(L, "Alcance",   a.alcance,   700,  y);
+  y += 32 * k; filaEstadistica(L, "Velocidad", b.velocidad, 350,  y);
+  y += 40 * k;
+  textoFicha("SÚPER: " + b.super.nombre.toUpperCase(), x, y, 20 * k, "#ffd32a", 4 * k);
+
+  // 6) Botón JUGAR (late un poco para invitar a pulsarlo)
+  const bt = L.boton, late = 1 + Math.sin(t * 4) * 0.03;
+  ctx.save();
+  ctx.translate(bt.x + bt.w / 2, bt.y + bt.h / 2);
+  ctx.scale(late, late);
+  const g = ctx.createLinearGradient(0, -bt.h / 2, 0, bt.h / 2);
+  g.addColorStop(0, "#ffe46b"); g.addColorStop(1, "#ffb300");
+  ctx.fillStyle = "#111";
+  ctx.fillRect(-bt.w / 2 - 3 * k, -bt.h / 2 + 3 * k, bt.w + 6 * k, bt.h + 3 * k);   // sombra de abajo
+  ctx.fillStyle = g;
+  ctx.fillRect(-bt.w / 2, -bt.h / 2, bt.w, bt.h);
+  ctx.strokeStyle = "#111"; ctx.lineWidth = 4 * k; ctx.strokeRect(-bt.w / 2, -bt.h / 2, bt.w, bt.h);
+  ctx.font = "900 " + 34 * k + "px sans-serif";
+  ctx.textAlign = "center"; ctx.lineJoin = "round";
+  ctx.lineWidth = 6 * k; ctx.strokeStyle = "#111"; ctx.strokeText("JUGAR", 0, 12 * k);
+  ctx.fillStyle = "white"; ctx.fillText("JUGAR", 0, 12 * k);
+  ctx.restore();
+  ctx.textAlign = "left";
 }
