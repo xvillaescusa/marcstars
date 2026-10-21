@@ -134,6 +134,10 @@ function dibujarHUD() {
 // ★ NUEVO: botones de la pantalla de ¡ELIMINADO!
 function botonesMuerte() {
   const ancho = 200, alto = 50, hueco = 20, y = canvas.height / 2 + 20;
+  // ★ PASO 20: con un solo brawler no hay nada que cambiar: solo "Reintentar", centrado
+  if (BRAWLERS.length === 1) {
+    return [{ x: canvas.width / 2 - ancho / 2, y: y, ancho: ancho, alto: alto, texto: "Reintentar (R)", color: "#27ae60", accion: reiniciar }];
+  }
   const x0 = canvas.width / 2 - ancho - hueco / 2;
   return [
     { x: x0, y: y, ancho: ancho, alto: alto, texto: "Reintentar (R)", color: "#27ae60", accion: reiniciar },
