@@ -22,7 +22,7 @@ const BRAWLERS = [
     //          "intervaloRafaga" = segundos entre una bala y la siguiente
     //          "dispersion" = grados de imprecisión al azar (como un fusil de verdad)
     ataque: { balas: 1, abertura: 0, dano: 230, alcance: 460, velocidadBala: 760,
-              rafaga: 5, intervaloRafaga: 0.08, dispersion: 4 },   // ★ ráfaga de 5 balas
+              rafaga: 5, intervaloRafaga: 0.08, dispersion: 0 },   // ★ ráfaga de 5 balas, todas en la misma línea
     cargaPorImpacto: 0.07,                    // cada bala de la ráfaga carga un poco (ahora salen 5)
     super: { tipo: "bomba", nombre: "Granada", estilo: "granada", dano: 1100, radio: 85, alcance: 340 }
   }

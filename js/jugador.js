@@ -44,25 +44,36 @@ function crearJugador(b) {
 // dispararJugador() decide cuántas tandas: 1 normalmente, 3 seguidas si hay ráfaga.
 function dispararJugador() {
   const a = jugador.brawler.ataque;
-  dispararTanda();
+  // ★ PASO 21: LA DIRECCIÓN SE DECIDE UNA SOLA VEZ, al soltar el botón (o hacer clic).
+  // Toda la ráfaga usa ESE ángulo, aunque luego te muevas o el apuntado cambie.
+  jugador.anguloRafaga = anguloDeDisparo();
+  dispararTanda(jugador.anguloRafaga);
   if (a.rafaga > 1) {
     jugador.rafagaRestante = a.rafaga - 1;       // las demás salen después, una a una
     jugador.tiempoRafaga = a.intervaloRafaga;
   }
 }
 
-function dispararTanda() {
-  const a = jugador.brawler.ataque;
+// ★ PASO 21: el ángulo de disparo en ESTE momento (hacia el ratón / donde apunta el dedo)
+function anguloDeDisparo() {
   let angulo = anguloHacia(jugador, raton.x, raton.y);
-  // si el personaje es un sprite, la bala sale de la BOCA DEL FUSIL
-  // del dibujo (sprites.js) y no del centro del personaje.
+  // Si el personaje es un sprite, la bala sale de la boca del fusil: apuntamos
+  // desde la boca hacia el objetivo, para que la línea pase justo por donde apuntas.
+  const boca = (typeof obtenerBocaFusil === "function") ? obtenerBocaFusil(jugador, angulo) : null;
+  if (boca && Math.hypot(raton.x - boca.x, raton.y - boca.y) > 40) {
+    angulo = anguloHacia(boca, raton.x, raton.y);
+  }
+  return angulo;
+}
+
+// Saca UNA tanda de balas en la dirección "angulo" (fija para toda la ráfaga).
+// La bala sale de la boca del fusil, desde donde esté el personaje AHORA.
+function dispararTanda(angulo) {
+  const a = jugador.brawler.ataque;
   const boca = (typeof obtenerBocaFusil === "function") ? obtenerBocaFusil(jugador, angulo) : null;
   const origen = boca || { x: jugador.x, y: jugador.y, altura: 0.45 };
-  if (boca && Math.hypot(raton.x - boca.x, raton.y - boca.y) > 40) {
-    angulo = anguloHacia(boca, raton.x, raton.y);      // apuntar desde la boca hacia el ratón
-  }
   jugador.contadorDisparos = (jugador.contadorDisparos || 0) + 1;   // avisa al sprite
-  // dispersión al azar entre -dispersion y +dispersion grados
+  // dispersión al azar entre -dispersion y +dispersion grados (0 = todas en línea)
   if (a.dispersion) angulo += (Math.random() - 0.5) * 2 * a.dispersion * Math.PI / 180;
   const abertura = a.abertura * Math.PI / 180;
   for (let i = 0; i < a.balas; i++) {
@@ -100,6 +111,8 @@ function actualizarJugador(dt) {
 
   // durante la embestida no controlas al personaje (lo mueve super.js)   // mirar siempre hacia el ratón
   jugador.angulo = anguloHacia(jugador, raton.x, raton.y);
+  // ★ PASO 21: mientras sale la ráfaga, el personaje sigue mirando hacia donde disparó
+  if ((jugador.rafagaRestante > 0 || jugador.tiempoDesdeDisparo < 0.35) && jugador.anguloRafaga !== undefined) jugador.angulo = jugador.anguloRafaga;
   jugador.tiempoAnim += dt;
 
   if (jugador.embestida) return;
@@ -130,7 +143,7 @@ function actualizarJugador(dt) {
   if (jugador.rafagaRestante > 0) {
     jugador.tiempoRafaga -= dt;
     if (jugador.tiempoRafaga <= 0) {
-      dispararTanda();
+      dispararTanda(jugador.anguloRafaga);       // ★ misma dirección que la primera bala
       jugador.rafagaRestante--;
       jugador.tiempoRafaga = jugador.brawler.ataque.intervaloRafaga;
     }
