@@ -134,14 +134,10 @@ function dibujarHUD() {
 // ★ NUEVO: botones de la pantalla de ¡ELIMINADO!
 function botonesMuerte() {
   const ancho = 200, alto = 50, hueco = 20, y = canvas.height / 2 + 20;
-  // ★ PASO 20: con un solo brawler no hay nada que cambiar: solo "Reintentar", centrado
-  if (BRAWLERS.length === 1) {
-    return [{ x: canvas.width / 2 - ancho / 2, y: y, ancho: ancho, alto: alto, texto: "Reintentar (R)", color: "#27ae60", accion: reiniciar }];
-  }
   const x0 = canvas.width / 2 - ancho - hueco / 2;
   return [
     { x: x0, y: y, ancho: ancho, alto: alto, texto: "Reintentar (R)", color: "#27ae60", accion: reiniciar },
-    { x: x0 + ancho + hueco, y: y, ancho: ancho, alto: alto, texto: "Cambiar brawler (M)", color: "#2980b9", accion: volverASeleccion }
+    { x: x0 + ancho + hueco, y: y, ancho: ancho, alto: alto, texto: BRAWLERS.length === 1 ? "Menú (M)" : "Cambiar brawler (M)", color: "#2980b9", accion: volverASeleccion }
   ];
 }
 function pulsarBotonMuerte(x, y) {
@@ -247,7 +243,12 @@ function dibujarSeleccion() {
   ctx.fillText("ELIGE TU BRAWLER", ANCHO_DISENO / 2, 75);
   ctx.font = "16px sans-serif";
   ctx.fillStyle = "#bbb";
-  ctx.fillText(modoTactil ? "Toca una tarjeta para jugar" : "Haz clic en una tarjeta o pulsa 1, 2, 3 o 4", ANCHO_DISENO / 2, 110);
+  // ★ PASO 20: el texto de ayuda depende de cuántos brawlers haya
+  const teclas = BRAWLERS.map((b, i) => i + 1).join(", ");
+  const ayudaSel = BRAWLERS.length === 1
+    ? (modoTactil ? "Toca a MarcStars para empezar la partida" : "Haz clic en MarcStars o pulsa 1 para empezar")
+    : (modoTactil ? "Toca una tarjeta para jugar" : "Haz clic en una tarjeta o pulsa " + teclas);
+  ctx.fillText(ayudaSel, ANCHO_DISENO / 2, 110);
   ctx.textAlign = "left";
 
   // Los máximos sirven para que las barras sean comparables entre brawlers.

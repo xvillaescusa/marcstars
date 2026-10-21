@@ -31,7 +31,6 @@ function reiniciar() {
 }
 
 function volverASeleccion() {
-  if (BRAWLERS.length === 1) return;       // ★ PASO 20: solo hay uno, no hay nada que elegir
   estadoJuego = "seleccion";
 }
 
@@ -89,11 +88,7 @@ requestAnimationFrame(bucle);
 let cargasPendientes = 3;   // imágenes, modelos .glb y hoja de sprites
 function unaCargaMenos() {
   cargasPendientes--;
-  if (cargasPendientes === 0) {
-    // ★ PASO 20: si solo hay un brawler, empezamos la partida directamente
-    if (BRAWLERS.length === 1) empezarPartida(0);
-    else estadoJuego = "seleccion";
-  }
+  if (cargasPendientes === 0) estadoJuego = "seleccion";   // pantalla de selección (ahora solo MarcStars)
 }
 cargarImagenes(unaCargaMenos);
 cargarModelosGLB(unaCargaMenos);
